@@ -1,17 +1,28 @@
 package com.planmate.planmate.repository;
 
-import com.planmate.planmate.domain.Domain;
+import com.planmate.planmate.domain.Task;
 import com.planmate.planmate.dto.DomainResponseDto;
+
 import java.util.List;
 import java.util.Optional;
 
+// 인터페이스
 public interface DomainRepository {
 
-    Domain saveDomain(Domain domain); //  저장
-    List<Domain> findAllDomains(); // 전체 일정 조회
-    Optional<Domain> findDomainById(Long id); // 특정일정조회
 
-    int updateComment(Long id, String title, String comment); // 전체 수정
+    Task saveTask(Task task); // 메모 저장
+
+    List<DomainResponseDto> findAllTask();   // 전체 조회
+
+    Optional<Task> findTaskById(Long id);  // 단일 일정 조회
+
+    Optional<Task> findTaskByIdForAuth(Long id); // 비밀번호 확인
+
+    int update(Long id, String title, String comment); // 전체 수정
+
     int updateTitle(Long id, String title); // 제목만 수정
-    int deleteTask(Long id); // 메모 삭제
+
+    int delete(Long id); // 삭제
 }
+
+
