@@ -12,7 +12,10 @@ public interface DomainService {
     List<DomainResponseDto> findAllTasks();
     DomainResponseDto findTaskById(Long id);
     Task findTaskByIdOrElseThrow(Long id);
-    DomainResponseDto updateTask(Long id, DomainRequestDto requestDto);
+    DomainResponseDto updateTask(Long id, String title, String comment);
+    DomainResponseDto updateTitle(Long id, String title);
+    void delete(Long id);
+
 
 }
 

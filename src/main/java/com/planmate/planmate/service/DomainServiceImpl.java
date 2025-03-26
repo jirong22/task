@@ -4,9 +4,12 @@ import com.planmate.planmate.domain.Task;
 import com.planmate.planmate.dto.DomainRequestDto;
 import com.planmate.planmate.dto.DomainResponseDto;
 import com.planmate.planmate.repository.DomainRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.concurrent.SimpleAsyncTaskScheduler;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -55,12 +58,53 @@ public class DomainServiceImpl implements DomainService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 일정이 존재하지 않습니다: " + id));
     }
 
+    @Transactional
     @Override
-    public DomainResponseDto updateTask(Long id, DomainRequestDto requestDto) {
-        Task task = findTaskByIdOrElseThrow(id);
-        task.update(requestDto.getTitle(), requestDto.getComment());
-        domainRepository.saveTask(task);
-        return new DomainResponseDto(task);
-    }
+    // 메모
+    public DomainResponseDto updateTask(Long id, String title, String comment) {
+        // 필수값 확인
+        if (title == null || comment == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "제목과 내용은 필수입니다.");
+        }
+        int updatedRow = domainRepository.updateTask(id, title, comment);
 
+        // 수정된 행이 없다면 에러
+        if (updatedRow == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "수정 대상이 없습니다. ID: " + id);
+        }
+
+        // 수정된 결과 다시 조회하여 반환
+        Task updatedTask = domainRepository.findTaskById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "조회 실패. ID: " + id));
+
+        return new DomainResponseDto(updatedTask);
+
+    }
+    @Transactional
+    @Override
+    public DomainResponseDto updateTitle(Long id, String title) {
+        // 제목만 있어야 하고, 내용은 null이어야 함
+        if (title == null ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "제목은 필수입니다!");
+        }
+
+        int updatedRow = domainRepository.updateTitle(id, title);
+        if (updatedRow == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "수정 대상이 없습니다. ID: " + id);
+        }
+
+        Task updatedTask = domainRepository.findTaskById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "조회 실패. ID: " + id));
+
+        return new DomainResponseDto(updatedTask);
+    }
+    @Override
+    public void delete(Long id) {
+        int deletedRow = domainRepository.delete(id);
+        // 삭제된 행이 없으면 에러
+        if (deletedRow == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "삭제 대상이 없습니다. ID: " + id);
+        }
+    }
 }
+

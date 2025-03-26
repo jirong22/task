@@ -90,13 +90,15 @@ public class JdbcTaskRepository implements DomainRepository {
     }
 
     @Override
-    public int update(Long id, String title, String comment) {
+    //ID 로 할일 제목 내용 수정
+    public int updateTask(Long id, String title, String comment) {
         return jdbcTemplate.update(
                 "UPDATE task SET title = ?, comment = ? WHERE id = ?", title, comment, id
         );
     }
 
     @Override
+    //ID로 제목만 수정
     public int updateTitle(Long id, String title) {
         return jdbcTemplate.update(
                 "UPDATE task SET title = ? WHERE id = ?", title, id
@@ -104,6 +106,7 @@ public class JdbcTaskRepository implements DomainRepository {
     }
 
     @Override
+    //ID에 해당하는 일정 삭제
     public int delete(Long id) {
         return jdbcTemplate.update(
                 "DELETE FROM task WHERE id = ?", id

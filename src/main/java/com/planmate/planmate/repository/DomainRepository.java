@@ -18,9 +18,9 @@ public interface DomainRepository {
 
     Optional<Task> findTaskByIdForAuth(Long id); // 비밀번호 확인
 
-    int update(Long id, String title, String comment); // 전체 수정
+    int updateTask(Long id, String title, String comment); // 전체 수정
 
-    int updateTitle(Long id, String title); // 제목만 수정
+    int updateTitle(Long id, String title); //ID로 제목만 수정
 
     int delete(Long id); // 삭제
 }
