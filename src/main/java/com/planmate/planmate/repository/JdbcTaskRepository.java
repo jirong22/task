@@ -12,10 +12,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.sql.DataSource;
 import java.security.Key;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Repository
 public class JdbcTaskRepository implements DomainRepository {
@@ -27,6 +25,7 @@ public class JdbcTaskRepository implements DomainRepository {
     }
 
     @Override
+    //저장
     public Task saveTask(Task task) {
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         jdbcInsert.withTableName("task").usingGeneratedKeyColumns("id");
@@ -37,6 +36,8 @@ public class JdbcTaskRepository implements DomainRepository {
         parameters.put("comment", task.getComment());
         parameters.put("author", task.getAuthor());
         parameters.put("password", task.getPassword());
+        parameters.put("created_at", task.getCreatedAt());
+        parameters.put("modified_at", task.getModifiedAt());
         // 실행 후 반환
         Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameters));
         System.out.println("key = " + key);
@@ -45,7 +46,9 @@ public class JdbcTaskRepository implements DomainRepository {
                 task.getTitle(),
                 task.getComment(),
                 task.getAuthor(),
-                task.getPassword()
+                task.getPassword(),
+                task.getCreatedAt(),
+                task.getModifiedAt()
         );
     }
 
@@ -53,21 +56,23 @@ public class JdbcTaskRepository implements DomainRepository {
     //전체 일정 리스트로 조회
     public List<DomainResponseDto> findAllTask() {
         return jdbcTemplate.query(
-                "SELECT * FROM task", taskRowMapper()
+                "SELECT * FROM task ORDER BY modified_at DESC", taskRowMapper()
         );
     }
+
     //ResponseDto용 RowMapper
     private RowMapper<DomainResponseDto> taskRowMapper() {
         return (rs, rowNum) -> new DomainResponseDto(
                 rs.getLong("id"),
                 rs.getString("title"),
                 rs.getString("comment"),
-                rs.getString("author")
+                rs.getString("author"),
+                rs.getTimestamp("modified_at").toLocalDateTime()
         );
     }
 
     @Override
-    // 단일 일정조회
+    //단일일정조회
     public Optional<Task> findTaskById(Long id) {
         List<Task> result = jdbcTemplate.query(
                 "SELECT * FROM task WHERE id = ?", taskRowMapperV2(), id);
@@ -81,7 +86,7 @@ public class JdbcTaskRepository implements DomainRepository {
         Task task = result.stream().findAny()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
 
-        // 비밀번호 비교
+        // 비밀번호 비교 (임시 구현)
         if (task.getPassword().equals("요청한 비밀번호")) {
             return Optional.of(task);
         } else {
@@ -93,7 +98,8 @@ public class JdbcTaskRepository implements DomainRepository {
     //ID 로 할일 제목 내용 수정
     public int updateTask(Long id, String title, String comment) {
         return jdbcTemplate.update(
-                "UPDATE task SET title = ?, comment = ? WHERE id = ?", title, comment, id
+                "UPDATE task SET title = ?, comment = ?, modified_at = ? WHERE id = ?",
+                title, comment, LocalDateTime.now(), id
         );
     }
 
@@ -101,12 +107,13 @@ public class JdbcTaskRepository implements DomainRepository {
     //ID로 제목만 수정
     public int updateTitle(Long id, String title) {
         return jdbcTemplate.update(
-                "UPDATE task SET title = ? WHERE id = ?", title, id
+                "UPDATE task SET title = ?, modified_at = ? WHERE id = ?",
+                title, LocalDateTime.now(), id
         );
     }
 
     @Override
-    //ID에 해당하는 일정 삭제
+    //삭제
     public int delete(Long id) {
         return jdbcTemplate.update(
                 "DELETE FROM task WHERE id = ?", id
@@ -119,7 +126,30 @@ public class JdbcTaskRepository implements DomainRepository {
                 rs.getString("title"),
                 rs.getString("comment"),
                 rs.getString("author"),
-                null
+                null,
+                rs.getTimestamp("created_at").toLocalDateTime(),
+                rs.getTimestamp("modified_at").toLocalDateTime()
         );
     }
+    @Override
+    //조건부 일정조회
+    public List<DomainResponseDto> searchTasks(String author, String modifiedDate) {
+        String sql = "SELECT * FROM task WHERE 1=1";
+        List<Object> params = new ArrayList<>();
+
+        if (author != null && !author.isEmpty()) {
+            sql += " AND author = ?";
+            params.add(author);
+        }
+
+        if (modifiedDate != null && !modifiedDate.isEmpty()) {
+            sql += " AND DATE(modified_at) = ?";
+            params.add(modifiedDate);
+        }
+
+        sql += " ORDER BY modified_at DESC";
+
+        return jdbcTemplate.query(sql, taskRowMapper(), params.toArray());
+    }
+
 }

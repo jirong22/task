@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,6 +17,8 @@ public class DomainResponseDto {
     private String title;  // 메모 제목
     private String comment; // 메모 내용
     private String author; //작성자
+    private LocalDateTime modifiedAt;
+
 
     public DomainResponseDto(Task task) {
         this.id = task.getId();

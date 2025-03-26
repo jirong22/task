@@ -37,6 +37,17 @@ public class DomainController {
         List<DomainResponseDto> tasksList = domainService.findAllTasks();
         return ResponseEntity.ok(tasksList);
     }
+
+    @GetMapping("/search")
+    //작성자,수정일 기준
+    public ResponseEntity<List<DomainResponseDto>> searchTasks(
+            @RequestParam(required = false) String author,
+            @RequestParam(required = false) String modifiedDate
+    ) {
+        List<DomainResponseDto> result = domainService.searchTasks(author, modifiedDate);
+        return ResponseEntity.ok(result);
+    }
+
     @GetMapping ("/{id}")
     // ID로 할일조회
     public ResponseEntity<DomainResponseDto> findTaskById(@PathVariable Long id) {

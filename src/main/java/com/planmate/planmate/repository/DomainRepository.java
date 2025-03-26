@@ -14,6 +14,8 @@ public interface DomainRepository {
 
     List<DomainResponseDto> findAllTask();   // 전체 조회
 
+    List<DomainResponseDto> searchTasks(String author, String modifiedDate);//조건부 일정 조회
+
     Optional<Task> findTaskById(Long id);  // 단일 일정 조회
 
     Optional<Task> findTaskByIdForAuth(Long id); // 비밀번호 확인

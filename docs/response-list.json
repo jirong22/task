@@ -1,14 +1,16 @@
 [
   {
     "id": 1,
-    "title": "공부하기",
-    "comment": "자바 강의 듣기",
-    "author": "지롱"
+    "title": "스터디 하기",
+    "comment": "백엔드 정리하기",
+    "author": "지롱",
+    "modifiedAt": "2025-03-26T18:20:00"
   },
   {
     "id": 2,
-    "title": "운동하기",
-    "comment": "헬스장 가기",
-    "author": "변상준"
+    "title": "산책하기",
+    "comment": "봄 바람 쐬기",
+    "author": "지롱",
+    "modifiedAt": "2025-03-26T10:14:00"
   }
 ]

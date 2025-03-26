@@ -45,6 +45,11 @@ public class DomainServiceImpl implements DomainService {
     }
 
     @Override
+    public List<DomainResponseDto> searchTasks(String author, String modifiedDate) {
+        return domainRepository.searchTasks(author, modifiedDate);
+    }
+
+    @Override
     //단일 조회
     //클라이언트 응답
     public DomainResponseDto findTaskById(Long id) {

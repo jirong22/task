@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 
 @Setter
 @Getter
@@ -17,7 +19,8 @@ public class Task {
     private String comment; // 메모 내용
     private String author; // 작성자명
     private String password; // 비밀번호
-
+    private LocalDateTime createdAt; //생성시간
+    private LocalDateTime modifiedAt; // 수정시간
 
     // 저장용 생성자(id 없이 생성)
     public Task(String title, String comment, String author, String password) {
@@ -25,15 +28,7 @@ public class Task {
         this.comment = comment;
         this.author = author;
         this.password = password;
-    }
-
-    public void update(String title, String comment) {
-        this.title = title;
-        this.comment = comment;
-    }
-
-    // 제목만 수정
-    public void update(String title) {
-        this.title = title;
+        this.createdAt = LocalDateTime.now();
+        this.modifiedAt = LocalDateTime.now();
     }
 }

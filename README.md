@@ -10,6 +10,7 @@
 |--------|-----|------|-------------|-------------|-----------|
 | POST | /tasks | 일정 생성 | [요청](docs/request-example.json) | [응답](docs/response-example.json) | 201 |
 | GET | /tasks | 전체 일정 조회 | - | [응답](docs/response-list.json) | 200 |
+| GET | /tasks/search?author=지롱&modifiedDate=2025-03-26 | 조건부 일정 조회 (작성자, 수정일) | - | [응답](docs/response-list.json) | 200 |
 | GET | /tasks/{id} | 단일 일정 조회 | - | [응답](docs/response-example.json) | 200 |
 | PUT | /tasks/{id} | 일정 수정 | [요청](docs/request-example.json) | [응답](docs/response-example.json) | 200 |
 | PATCH | /tasks/{id} | 제목만 수정 | [요청](docs/request-title.json) | [응답](docs/response-example.json) | 200 |

@@ -9,6 +9,7 @@ import java.util.List;
 public interface DomainService {
 
     DomainResponseDto saveTasks(DomainRequestDto requestDto);
+    List<DomainResponseDto> searchTasks(String author, String modifiedDate);
     List<DomainResponseDto> findAllTasks();
     DomainResponseDto findTaskById(Long id);
     Task findTaskByIdOrElseThrow(Long id);
